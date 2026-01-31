@@ -256,8 +256,8 @@ Would you like to set a custom root password? (Y/n):
         11) Quit\n
         Enter option: '''
         )
-        while int(choice) not in range(1, 11):
-            choice = input('Please select a valid choice 1-10: ')
+        while int(choice) not in range(1, 12):
+            choice = input('Please select a valid choice 1-11: ')
         options = {
             '1': changeRootPwd,
             '2': usrShell,
