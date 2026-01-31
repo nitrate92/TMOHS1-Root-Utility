@@ -15,6 +15,7 @@ import telnetlib
 from getpass import getpass
 from ftplib import FTP
 import argparse
+from datetime import datetime
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-v', '--verbose',
@@ -212,6 +213,16 @@ def disableOmadm(conn):
     conn.read_very_eager()  # clear the read queue either way
     print('Succesfully removed OMA-DM bootstrap, if one was present.')
 
+def syncTime(conn):
+    conn.resetIfDead()
+    current_date = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    cmd = 'date -s "' + current_date + '"'
+    conn.send(cmd)
+    if args.verbose:
+        print(f'Received: {conn.read_very_eager().decode()}')
+    conn.read_very_eager()  # clear the read queue either way
+    print('Succesfully synced with host\'s time.')
+
 
 def chooseAction(conn):
     conn.resetIfDead()
@@ -240,8 +251,9 @@ Would you like to set a custom root password? (Y/n):
         6) Remove OMA-DM bootstrap (disables firmware updates, recommended)
         7) Enable mood lighting (look at the battery LED)
         8) Mask hotspot data as "on-client-device" data
-        9) Reboot
-        10) Quit\n
+        9) Sync time with host system
+        10) Reboot
+        11) Quit\n
         Enter option: '''
         )
         while int(choice) not in range(1, 11):
@@ -255,8 +267,9 @@ Would you like to set a custom root password? (Y/n):
             '6': disableOmadm,
             '7': moodLighting,
             '8': maskHotspot,
-            '9': reboot,
-            '10': quit
+            '9': syncTime,
+            '10': reboot,
+            '11': quit
         }
         options[choice](conn)
         chooseAction(conn)
